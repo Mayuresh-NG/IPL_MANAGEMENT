@@ -1,0 +1,72 @@
+@startuml
+
+title Tournament Management System
+
+class Tournament {
+  + name: String
+  + matchFormat: MatchFormat
+  + teams: List<Team> { getTeams() }
+  + matches: List<Match> { getMatches() }
+  + playerStats: Map<String, Player> { updatePlayerStats(), getPlayerStats() }
+  + teamScores: Map<String, TeamScore> { getTeamRankings(), getTeamScores() }
+
+  + Tournament(MatchFormat)
+  + getHighestWicketTaker(): Player
+  + getMaxFiftiesScorer(): Player
+  + showScoreboard()
+  + getSemifinalists(): List<Team>
+  + getTopRunScorers(): List<Player>
+}
+
+class Team<P extends Player> {
+  + name: String
+  + homeGround: String
+  + players: List<P> { getPlayers() }
+
+  + Team(String, String, List<P>)
+}
+
+class Player {
+  + name: String
+  + runsScored: int { addRunsScored(int), getRunsScored() }
+  + wicketsTaken: int { addWicketsTaken(int), getWicketsTaken() }
+  + fiftiesCount: int { incrementFiftiesCount(), getFiftiesCount() }
+
+  + Player(String, int, int)
+}
+
+enum MatchFormat {
+  IPL,
+  T20,
+  ODI
+}
+
+class TeamScore {
+  + teamName: String
+  + wins: int { incrementWins() }
+  + points: int { addPoints(int), getPoints() }
+
+  + TeamScore(String)
+}
+
+class Match {
+  + team1: Team
+  + team2: Team
+  + team1PlayerStats: Map<Player, Integer>
+  + team2PlayerStats: Map<Player, Integer>
+
+  + Match(Team, Team)
+  + updatePlayerStats(Player, int, int)
+}
+
+Player <-> Team : plays for
+Team1 -* Team2  : plays against
+Tournament o--* Team : creates
+Tournament o--* Match : creates
+
+TournamentStatsThread --> analyzeData
+HighestWicketTakerThread --> analyzeData
+ScoreBoardThread --> displayData
+TopRunScorersThread --> analyzeData
+
+@enduml
